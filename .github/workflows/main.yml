@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to Apache2 Server
 
 on:
   push:
@@ -13,15 +13,21 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Setup apach2
-      uses: actions/setup-apache@v3
-      with:
-        node-version: '2.0'
+    - name: Install Apache2
+      run: |
+        sudo apt-get update
+        sudo apt-get install apache2 -y
+        sudo service apache2 start
 
-    - name: Install SSH Client
-      run: sudo apt-get install -y openssh-client
+    - name: Copy HTML Project to Apache2 Document Root
+      run: |
+        sudo cp -r * /var/www/html/
 
-    - name: Deploy to Server
-      run: scp -r /home/gautami/Downloads/AI-Assist-Strapi-Website-main* ubuntu@13.232.63.4:html
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Set Permissions (adjust as needed)
+      run: |
+        sudo chown -R www-data:www-data /var/www/html
+        sudo chmod -R 755 /var/www/html
+
+    - name: Restart Apache2
+      run: |
+        sudo service apache2 restart
