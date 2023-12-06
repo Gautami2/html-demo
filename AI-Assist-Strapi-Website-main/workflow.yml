@@ -1,0 +1,27 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup apach2
+      uses: actions/setup-apache@v3
+      with:
+        node-version: '2.0'
+
+    - name: Install SSH Client
+      run: sudo apt-get install -y openssh-client
+
+    - name: Deploy to Server
+      run: scp -r /home/gautami/Downloads/AI-Assist-Strapi-Website-main* ubuntu@13.232.63.4:html
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
